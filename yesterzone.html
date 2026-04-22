@@ -9,17 +9,71 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* =========================================================================
+     COLOR PALETTE — YESTER ZONE / CREATIVE SIDE PROJECT (yesterzone.html)
+     =========================================================================
+     This is the control panel for every color on your Yester Zone page.
+     Change a hex code here and it updates EVERYWHERE on this page.
+
+     These colors are INTENTIONALLY different from your main portfolio.
+     The main portfolio (index.html) uses cool navy + gold for corporate
+     polish. This page uses warm brown + amber for a nostalgic, retro feel.
+
+     NOTE: Changing colors here does NOT affect your main portfolio page.
+     The two pages have separate palettes on purpose.
+     ========================================================================= */
   :root {
+    /* --bg is the MAIN BACKGROUND COLOR of the Yester Zone page.
+       Currently a warm, dark brown (like an old tube TV cabinet). */
     --bg: #1A1410;
+
+    /* --bg-deep is an even DARKER BROWN used inside video frames and
+       the "manifesto" box. Adds depth so elements feel inset. */
     --bg-deep: #0F0B08;
+
+    /* --bg-elevated is slightly LIGHTER than --bg, used for gradient effects
+       in the video placeholder thumbnails. */
     --bg-elevated: #231C16;
+
+    /* --text is the MAIN TEXT COLOR — headlines, body copy.
+       Currently a warm cream/parchment. Feels like old paper. */
     --text: #E8D9BF;
+
+    /* --text-dim is SECONDARY TEXT — descriptions, meta info. */
     --text-dim: #9A8870;
+
+    /* --text-faint is the FAINTEST TEXT — placeholder labels, timestamps. */
     --text-faint: #5A4E3E;
+
+    /* --amber is THE PRIMARY ACCENT COLOR for this page.
+       Think: warm golden light from a tube TV or sunset. It's used for:
+       - The italicized word "Yester" in the huge title
+       - The "REC" indicator in the TV badge
+       - Video tape labels (EP.01, NEW, COMING)
+       - Stat numbers (150K+, 2023, 100%)
+       - Marquee stars and hover states
+       To change the whole vibe of this page, start here.
+       Suggested alternatives:
+         #E5A84A (brighter gold)     #C47C3C (deeper orange)
+         #B8956A (muted tan)         #9CAF88 (sage green) */
     --amber: #D4A04A;
+
+    /* --rust is the SECONDARY ACCENT — a warm reddish-brown.
+       Used sparingly for: the blinking REC dot, the secondary button
+       ("See the films"), marquee star accents.
+       This should complement --amber, not compete with it. */
     --rust: #B85A3B;
+
+    /* --olive is a THIRD ACCENT that's reserved for future use.
+       Currently not heavily used on the page. Safe to leave alone. */
     --olive: #7A8560;
+
+    /* --line is the color of THIN DIVIDER LINES around video cards,
+       between sections, and in the stats grid. Very subtle by design. */
     --line: #2E241B;
+
+    /* --line-bright is a slightly brighter line color for hover states
+       and card borders. */
     --line-bright: #4A3A2A;
   }
 
