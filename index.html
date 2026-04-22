@@ -9,14 +9,61 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* =========================================================================
+     COLOR PALETTE — CORPORATE PORTFOLIO (index.html / main page)
+     =========================================================================
+     This is the control panel for every color on your main portfolio page.
+     Change a hex code here and it updates EVERYWHERE that color is used.
+     A hex code is the #XXXXXX number. Paste any new one in to swap colors.
+
+     Tool for picking new colors: https://coolors.co/
+     Or just google "hex color picker" and click around visually.
+
+     NOTE: These colors ONLY affect the main portfolio page (index.html).
+     The Yester Zone page (yesterzone.html) has its own separate palette
+     at the top of that file. Changing colors here does NOT affect that page.
+     ========================================================================= */
   :root {
+    /* --bg is the MAIN BACKGROUND COLOR of the whole page.
+       Currently a very dark, near-black navy. */
     --bg: #0A0E13;
+
+    /* --bg-elevated is the slightly lighter background behind video work cards.
+       It creates subtle contrast so cards appear to "sit on top of" the page. */
     --bg-elevated: #11161E;
+
+    /* --text is the MAIN TEXT COLOR — headlines, body copy, button text.
+       Currently a warm off-white/cream. */
     --text: #E8E5DE;
+
+    /* --text-dim is SECONDARY TEXT — subtitles, descriptions, captions.
+       Less important text that shouldn't compete with main text. */
     --text-dim: #8B8F97;
+
+    /* --text-faint is the FAINTEST TEXT — placeholder labels, tiny meta info.
+       Barely visible by design. You rarely need to change this. */
     --text-faint: #4A4E57;
+
+    /* --accent is THE MOST IMPORTANT COLOR TO KNOW ABOUT.
+       This is your signature color. It's used for:
+       - The primary "See the work" button
+       - The little pulsing dot next to "Available for new roles"
+       - The italicized word "narrative" in the hero headline
+       - Section numbers (01, 02, 03, 04)
+       - Arrows and hover accents throughout
+       Currently a warm muted gold/amber. To rebrand the whole site,
+       change this one value. Suggested alternatives:
+         #3B82F6 (electric blue)   #10B981 (emerald green)
+         #EF4444 (sharp red)       #F59E0B (brighter gold)
+         #8B5CF6 (purple)          #EC4899 (pink) */
     --accent: #D4AF63;
+
+    /* --line is the color of THIN DIVIDER LINES between sections and
+       around video cards. Subtle, barely noticeable by design. */
     --line: #1C222C;
+
+    /* --line-bright is a slightly brighter line color, used for hover states
+       and secondary buttons like "Download résumé". */
     --line-bright: #2A3240;
   }
 
