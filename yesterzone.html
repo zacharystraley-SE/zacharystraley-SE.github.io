@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Yester Zone — Memory Archaeology</title>
+<meta name="description" content="A documentary YouTube channel about cultural memory and the quiet disappearance of shared American experiences.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1A1410;
+    --bg-deep: #0F0B08;
+    --bg-elevated: #231C16;
+    --text: #E8D9BF;
+    --text-dim: #9A8870;
+    --text-faint: #5A4E3E;
+    --amber: #D4A04A;
+    --rust: #B85A3B;
+    --olive: #7A8560;
+    --line: #2E241B;
+    --line-bright: #4A3A2A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Vignette */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* CRT scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 3px
+    );
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: multiply;
+  }
+
+  /* Film grain */
+  .grain {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 4;
+    mix-blend-mode: overlay;
+    animation: grainShift 8s steps(10) infinite;
+  }
+
+  @keyframes grainShift {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -5%); }
+    20% { transform: translate(-10%, 5%); }
+    30% { transform: translate(5%, -10%); }
+    40% { transform: translate(-5%, 15%); }
+    50% { transform: translate(-10%, 5%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 10%); }
+    80% { transform: translate(-15%, 0%); }
+    90% { transform: translate(10%, 5%); }
+  }
+
+  /* CRT glow tint */
+  .crt-tint {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(212, 160, 74, 0.03) 50%, rgba(184, 90, 59, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 5;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    background: rgba(26, 20, 16, 0.8);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .channel-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+
+  .channel-badge::before {
+    content: '●';
+    color: var(--rust);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .back-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--amber); }
+  .back-link::before { content: '← '; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .hero-tv {
+    border: 1px solid var(--line-bright);
+    padding: 12px 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 60px;
+    width: fit-content;
+    background: rgba(212, 160, 74, 0.04);
+    opacity: 0;
+    animation: fadeIn 1s ease 0.3s forwards;
+  }
+
+  .hero-tv .rec {
+    color: var(--rust);
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    font-size: clamp(56px, 11vw, 180px);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.5s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--amber);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+  }
+
+  .hero-sub {
+    max-width: 640px;
+    font-size: clamp(18px, 1.7vw, 22px);
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin-bottom: 60px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.7s forwards;
+  }
+
+  .hero-sub em {
+    font-style: italic;
+    color: var(--text);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.9s forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--line-bright);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .btn:hover {
+    background: var(--amber);
+    color: var(--bg-deep);
+    border-color: var(--amber);
+  }
+
+  .btn.rust {
+    border-color: var(--rust);
+    color: var(--rust);
+  }
+
+  .btn.rust:hover {
+    background: var(--rust);
+    color: var(--text);
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 100px 0;
+    position: relative;
+  }
+
+  .marquee-divider {
+    overflow: hidden;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: rgba(212, 160, 74, 0.03);
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .marquee-track {
+    display: inline-block;
+    animation: marquee 40s linear infinite;
+  }
+
+  .marquee-track span { margin: 0 40px; }
+  .marquee-track span::before { content: '✦ '; color: var(--rust); }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .section-lead {
+    max-width: 720px;
+    margin-bottom: 80px;
+  }
+
+  .section-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-variation-settings: "opsz" 144;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--amber);
+    font-weight: 300;
+  }
+
+  .section-desc {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* VIDEO GRID */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 32px;
+  }
+
+  .video-card {
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .video-card.featured { grid-column: span 4; }
+  .video-card.regular { grid-column: span 3; }
+  .video-card.small { grid-column: span 2; }
+
+  .video-card:hover { transform: translateY(-6px); }
+
+  .video-frame {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: var(--bg-deep);
+    border: 1px solid var(--line-bright);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow:
+      inset 0 0 80px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(212, 160, 74, 0.1);
+  }
+
+  .video-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .video-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 200, 120, 0.04) 3px,
+      rgba(255, 200, 120, 0.04) 4px
+    );
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .video-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: linear-gradient(135deg, #231C16, #1A1410);
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .video-placeholder .play-icon {
+    font-size: 32px;
+    color: var(--amber);
+    opacity: 0.6;
+  }
+
+  .video-tape-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 4;
+    background: var(--bg-deep);
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .video-views {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 4;
+    background: rgba(15, 11, 8, 0.85);
+    border: 1px solid var(--line-bright);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .video-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .video-card.featured .video-title { font-size: 28px; }
+
+  .video-title em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .video-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .video-meta .dot { color: var(--text-faint); }
+
+  .video-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-top: 10px;
+    font-weight: 300;
+  }
+
+  /* MANIFESTO */
+  .manifesto {
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    padding: 80px 60px;
+    position: relative;
+    margin-top: 40px;
+  }
+
+  .manifesto::before {
+    content: 'FILE // MANIFESTO';
+    position: absolute;
+    top: -10px;
+    left: 40px;
+    background: var(--bg);
+    padding: 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+  }
+
+  .manifesto-text {
+    max-width: 720px;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(22px, 2.4vw, 32px);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .manifesto-text em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .manifesto-text .drop {
+    display: inline-block;
+    font-size: 1.6em;
+    line-height: 0.9;
+    font-weight: 400;
+    color: var(--amber);
+    float: left;
+    padding-right: 8px;
+    padding-top: 6px;
+    font-style: italic;
+  }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 60px 0;
+  }
+
+  .stat {
+    padding: 40px 24px;
+    border-right: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(42px, 5vw, 64px);
+    line-height: 1;
+    color: var(--amber);
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    line-height: 1.4;
+  }
+
+  /* CTA */
+  .cta {
+    padding: 120px 0;
+    text-align: center;
+  }
+
+  .cta h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(48px, 8vw, 120px);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-bottom: 40px;
+  }
+
+  .cta h2 em {
+    font-style: italic;
+    color: var(--amber);
+    font-weight: 400;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  @media (max-width: 900px) {
+    .container, nav { padding-left: 24px; padding-right: 24px; }
+    .video-grid { grid-template-columns: 1fr; }
+    .video-card.featured, .video-card.regular, .video-card.small { grid-column: span 1; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--line); }
+    .manifesto { padding: 50px 30px; }
+    footer { flex-direction: column; gap: 10px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="crt-tint"></div>
+
+<nav>
+  <a href="#" class="channel-badge">YZ // CH. 007</a>
+  <a href="index.html" class="back-link">BACK TO ZACH STRALEY</a>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tv">
+      <span class="rec">●</span>
+      <span>REC</span>
+      <span style="color: var(--text-faint);">|</span>
+      <span>EST. 2023</span>
+      <span style="color: var(--text-faint);">|</span>
+      <span>DOCUMENTARY</span>
+      <span style="color: var(--text-faint);">|</span>
+      <span>ONGOING TRANSMISSION</span>
+    </div>
+    <h1>The <em>Yester</em><br>Zone.</h1>
+    <p class="hero-sub">
+      A documentary YouTube channel about the <em>quiet disappearance</em> of shared American experience. Playgrounds, parks, chain stores, childhood tropes — the stuff a whole generation took for granted and then, suddenly, didn't.
+    </p>
+    <div class="hero-actions">
+      <a href="https://youtube.com" target="_blank" class="btn">
+        ▶ WATCH ON YOUTUBE
+      </a>
+      <a href="#films" class="btn rust">
+        SEE THE FILMS ↓
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-divider">
+  <div class="marquee-track">
+    <span>MEMORY ARCHAEOLOGY</span>
+    <span>ABANDONED PLACES</span>
+    <span>LOST AMERICANA</span>
+    <span>SHARED NOSTALGIA</span>
+    <span>THE QUIET DISAPPEARANCE</span>
+    <span>MEMORY ARCHAEOLOGY</span>
+    <span>ABANDONED PLACES</span>
+    <span>LOST AMERICANA</span>
+    <span>SHARED NOSTALGIA</span>
+    <span>THE QUIET DISAPPEARANCE</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- FILMS -->
+  <section id="films">
+    <div class="section-lead">
+      <div class="section-kicker">02 / SELECTED TRANSMISSIONS</div>
+      <h2 class="section-title">The <em>films.</em></h2>
+      <p class="section-desc">
+        Long-form video essays. Full production in DaVinci Resolve: scripting, cinematography, color grading, audio mixing, motion graphics. Two early breakouts crossed 150,000 views, and the channel has since pivoted toward what I call memory archaeology.
+      </p>
+    </div>
+
+    <div class="video-grid">
+
+      <div class="video-card featured">
+        <div class="video-frame">
+          <div class="video-tape-label">EP.01</div>
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <div>PLACEHOLDER<br>PARKSVILLE</div>
+          </div>
+          <div class="video-views">150K+ VIEWS</div>
+        </div>
+        <div class="video-title">Parksville, Kentucky</div>
+        <div class="video-meta">
+          <span>EP.01</span>
+          <span class="dot">✦</span>
+          <span>ABANDONED</span>
+          <span class="dot">✦</span>
+          <span>2023</span>
+        </div>
+        <div class="video-desc">The first breakout. A small Kentucky town swallowed by a reservoir, and the people who still visit what's left above water.</div>
+      </div>
+
+      <div class="video-card small">
+        <div class="video-frame">
+          <div class="video-tape-label">EP.02</div>
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <div>PLACEHOLDER<br>CHIPPEWA LAKE</div>
+          </div>
+          <div class="video-views">150K+ VIEWS</div>
+        </div>
+        <div class="video-title">Chippewa Lake Park</div>
+        <div class="video-meta">
+          <span>EP.02</span>
+          <span class="dot">✦</span>
+          <span>AMUSEMENT</span>
+        </div>
+      </div>
+
+      <div class="video-card regular">
+        <div class="video-frame">
+          <div class="video-tape-label">NEW</div>
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <div>PLACEHOLDER<br>GIFTED KIDS</div>
+          </div>
+        </div>
+        <div class="video-title">The <em>Gifted</em> Kids</div>
+        <div class="video-meta">
+          <span>EP.11</span>
+          <span class="dot">✦</span>
+          <span>CULTURAL MEMORY</span>
+        </div>
+        <div class="video-desc">A full production cycle: script, teleprompter, parody commercial segment, custom data visualizations, original interview material.</div>
+      </div>
+
+      <div class="video-card regular">
+        <div class="video-frame">
+          <div class="video-tape-label">EP.09</div>
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <div>PLACEHOLDER<br>SIX GUN CITY</div>
+          </div>
+        </div>
+        <div class="video-title">Six Gun City</div>
+        <div class="video-meta">
+          <span>EP.09</span>
+          <span class="dot">✦</span>
+          <span>ROADSIDE</span>
+        </div>
+        <div class="video-desc">An abandoned western-themed park buried in the Daniel Boone National Forest. Locked script, full production run.</div>
+      </div>
+
+      <div class="video-card regular">
+        <div class="video-frame">
+          <div class="video-tape-label">COMING</div>
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <div>PLACEHOLDER<br>CENTRAL STATE</div>
+          </div>
+        </div>
+        <div class="video-title">Central State Hospital</div>
+        <div class="video-meta">
+          <span>UPCOMING</span>
+          <span class="dot">✦</span>
+          <span>INSTITUTIONAL</span>
+        </div>
+        <div class="video-desc">Relaunching with a sharper thesis: they knew the graves were there. They dug anyway.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding: 60px 0;">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">150K+</div>
+        <div class="stat-label">Breakout<br>Videos × 2</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2023</div>
+        <div class="stat-label">Channel<br>Founded</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Solo<br>Production</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Hours in<br>DaVinci Resolve</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section>
+    <div class="section-lead">
+      <div class="section-kicker">03 / THESIS</div>
+      <h2 class="section-title">Why <em>memory</em><br>archaeology?</h2>
+    </div>
+
+    <div class="manifesto">
+      <div class="manifesto-text">
+        <span class="drop">T</span>he interesting thing about cultural memory isn't the <em>big moments</em>. It's the specific textures we forgot we shared. The taste of a Sbarro slice in a mall food court. The feel of a Blockbuster carpet. A gifted-and-talented pullout room that promised everything and delivered a worksheet.
+        <br><br>
+        These things disappear <em>without ceremony</em>. Nobody writes an obituary for the ritual of Friday night video store trips. That's the work. That's the channel.
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Keep<br><em>watching.</em></h2>
+    <div class="hero-actions" style="justify-content: center; display: flex;">
+      <a href="https://youtube.com" target="_blank" class="btn">
+        ▶ SUBSCRIBE ON YOUTUBE
+      </a>
+      <a href="index.html" class="btn rust">
+        ← BACK TO ZACH STRALEY
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 THE YESTER ZONE</span>
+    <span>TRANSMISSION ONGOING</span>
+    <span>CH.007</span>
+  </footer>
+
+</div>
+
+<script>
+  // Year update
+  const year = new Date().getFullYear();
+  document.querySelector('footer span:first-child').textContent = `© ${year} THE YESTER ZONE`;
+
+  // Video card reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.video-card, .stat').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = `opacity 0.8s ease ${i * 0.1}s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.1}s`;
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
