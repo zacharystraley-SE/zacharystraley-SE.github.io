@@ -577,12 +577,16 @@ F
 
   /* MANIFESTO */
   .manifesto {
-    background: var(--bg-deep);
-    border: 1px solid var(--line);
-    padding: 80px 60px;
-    position: relative;
-    margin-top: 40px;
-  }
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  padding: 80px 60px;
+  position: relative;
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 60px;
+  align-items: start;
+}
 
   .manifesto::before {
     content: 'FILE // MANIFESTO';
@@ -624,6 +628,44 @@ F
     font-style: italic;
   }
 
+.manifesto-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-left: 1px solid var(--line-bright);
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.meta-key {
+  color: var(--text-faint);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+.meta-val {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+.status-live {
+  color: var(--amber);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-live::before {
+  content: '●';
+  color: var(--amber);
+  animation: blink 1.5s ease-in-out infinite;
+}
+  
   /* STATS */
   .stats {
     display: grid;
@@ -705,6 +747,18 @@ F
     .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--line); }
     .manifesto { padding: 50px 30px; }
     footer { flex-direction: column; gap: 10px; text-align: center; }
+
+.manifesto {
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+.manifesto-meta {
+  border-left: none;
+  border-top: 1px solid var(--line-bright);
+  padding-left: 0;
+  padding-top: 24px;
+}
+    
   }
 </style>
 </head>
@@ -895,12 +949,19 @@ F
     <h2 class="section-title">Why <em>memory</em><br>archaeology?</h2>
   </div>
   <div class="manifesto">
-    <div class="manifesto-text">
-      <span class="drop">E</span>verybody wants to document the <em>big stuff</em>. Elections, disasters, famous people dying. I'm more interested in the parts nobody thinks to write down. The layout of a Toys R Us at Christmas. The menu screen music on a rented DVD. The way the Scholastic book fair made us feel.
-      <br><br>
-      Most of what a generation actually <em>lived through</em> disappears without anyone noticing.
-    </div>
+  <div class="manifesto-text">
+    <span class="drop">E</span>verybody wants to document the <em>big stuff</em>. Elections, disasters, famous people dying. I'm more interested in the parts nobody thinks to write down. The layout of a Toys R Us at Christmas. The menu screen music on a rented DVD. The way the Scholastic book fair made us feel.
+    <br><br>
+    Most of what a generation actually <em>lived through</em> disappears without anyone noticing.
   </div>
+  <div class="manifesto-meta">
+    <div class="meta-row"><span class="meta-key">FILE</span><span class="meta-val">MANIFESTO.TXT</span></div>
+    <div class="meta-row"><span class="meta-key">SIZE</span><span class="meta-val">412 BYTES</span></div>
+    <div class="meta-row"><span class="meta-key">MODIFIED</span><span class="meta-val">2026.04.23</span></div>
+    <div class="meta-row"><span class="meta-key">TAGS</span><span class="meta-val">MEMORY / CULTURE</span></div>
+    <div class="meta-row"><span class="meta-key">STATUS</span><span class="meta-val status-live">ONGOING</span></div>
+  </div>
+</div>
 </section>
   
   <!-- CTA -->
