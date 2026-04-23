@@ -14,8 +14,8 @@
     --dim:#8B8F97;
     --bright:#E6E8EC;
     --items:7;
-    --step:1.05s;              /* per-item dwell */
-    --cycle: calc(var(--step) * var(--items));  /* total loop */
+    --step:1.05s;
+    --cycle: calc(var(--step) * var(--items));
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
@@ -27,17 +27,20 @@
     text-rendering:optimizeLegibility;
   }
 
+  /* Enable container queries on the card itself so all units inside
+     scale based on the iframe's actual size, not the viewport's. */
   .card{
+    container-type: size;
+    container-name: card;
     position:relative;
     width:100%;
     height:100%;
-    padding: clamp(28px, 5.2vw, 72px) clamp(32px, 6vw, 88px);
+    padding: 6cqh 7cqw;
     display:flex;
     flex-direction:column;
     overflow:hidden;
   }
 
-  /* ——— Top-of-card progress rail (full width, hairline) ——— */
   .progress{
     position:absolute;
     top:0; left:0; right:0;
@@ -59,23 +62,25 @@
     100% { transform: scaleX(1); opacity:0 }
   }
 
-  /* ——— Eyebrow: "PRODUCT TOUR" + pulsing dot ——— */
   .eyebrow{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap: 2cqw;
     font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-size:11px;
+    font-size: clamp(9px, 2.2cqw, 12px);
     letter-spacing:.22em;
     color:var(--dim);
     text-transform:uppercase;
     opacity:.75;
   }
   .dot{
-    width:6px;height:6px;border-radius:999px;
+    width: clamp(4px, 1.2cqw, 7px);
+    height: clamp(4px, 1.2cqw, 7px);
+    border-radius:999px;
     background:var(--gold);
     box-shadow:0 0 0 0 rgba(212,175,99,.55);
     animation: pulse 1.6s ease-out infinite;
+    flex-shrink: 0;
   }
   @keyframes pulse{
     0%   { box-shadow:0 0 0 0 rgba(212,175,99,.55); opacity:1 }
@@ -83,30 +88,24 @@
     100% { box-shadow:0 0 0 0 rgba(212,175,99,0); opacity:1 }
   }
 
-  /* ——— List ——— */
   .list-wrap{
     flex:1;
     display:flex;
     align-items:center;
-    margin-top: clamp(16px, 2.4vw, 28px);
+    margin-top: 3cqh;
+    min-height: 0;
   }
   .list{
     position:relative;
     width:100%;
-    max-width:720px;
     list-style:none;
   }
 
-  /* The travelling gold rail.
-     Each item gets a 1/7 slot. Inside each slot the rail dwells ~80% then
-     glides to the next position over the last ~20%.
-     Dwell window aligns with the text's bright hold; the glide finishes
-     exactly as the next item's bright hold begins. */
   .rail{
     position:absolute;
     left:0;
     top:0;
-    width:2px;
+    width: clamp(1.5px, .4cqw, 3px);
     height: calc(100% / var(--items));
     background:var(--gold);
     border-radius:2px;
@@ -115,31 +114,22 @@
                railFade var(--cycle) linear infinite;
   }
   @keyframes rail{
-    /* Slot 1: 0–14.2857%   dwell 0–11.43%, glide 11.43→14.29  */
     0%       { transform: translateY(0%)   }
     11.428%  { transform: translateY(0%)   }
     14.285%  { transform: translateY(100%) }
-    /* Slot 2 */
     25.714%  { transform: translateY(100%) }
     28.571%  { transform: translateY(200%) }
-    /* Slot 3 */
     40.000%  { transform: translateY(200%) }
     42.857%  { transform: translateY(300%) }
-    /* Slot 4 */
     54.285%  { transform: translateY(300%) }
     57.142%  { transform: translateY(400%) }
-    /* Slot 5 */
     68.571%  { transform: translateY(400%) }
     71.428%  { transform: translateY(500%) }
-    /* Slot 6 */
     82.857%  { transform: translateY(500%) }
     85.714%  { transform: translateY(600%) }
-    /* Slot 7 — dwell, then snap back via opacity trick handled by restart */
     97.142%  { transform: translateY(600%) }
     100%     { transform: translateY(600%) }
   }
-  /* Fade the rail briefly at the loop boundary so the jump from slot 7 back
-     to slot 1 isn't visible. */
   @keyframes railFade{
     0%, 2%      { opacity: 1 }
     97%, 99%    { opacity: 1 }
@@ -150,36 +140,26 @@
   .item{
     position:relative;
     display:grid;
-    grid-template-columns: 64px 1fr;
+    grid-template-columns: clamp(32px, 7cqw, 64px) 1fr;
     align-items:center;
-    gap: clamp(18px, 2.4vw, 32px);
-    padding: clamp(10px, 1.4vw, 16px) 0 clamp(10px, 1.4vw, 16px) clamp(20px, 2.2vw, 28px);
+    gap: clamp(12px, 2.5cqw, 32px);
+    padding: clamp(6px, 1.6cqh, 16px) 0 clamp(6px, 1.6cqh, 16px) clamp(12px, 2.8cqw, 28px);
   }
   .num{
     font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-size: clamp(13px, 1.05vw, 15px);
+    font-size: clamp(10px, 1.6cqw, 15px);
     letter-spacing:.04em;
     color:var(--dim);
-    /* no CSS transition — the keyframe animation drives color entirely,
-       otherwise the transition smears between keyframe stops. */
+    white-space: nowrap;
   }
   .label{
-    font-size: clamp(18px, 1.7vw, 24px);
+    font-size: clamp(13px, 2.4cqw, 24px);
     font-weight:400;
     letter-spacing:-.005em;
     color:var(--dim);
+    line-height: 1.2;
   }
 
-  /* Per-item active keyframes.
-     Each item owns a 1/7 slot (14.285% of cycle). Inside its slot:
-       • 0 → 1%       fade up
-       • 1 → 13.285%  HOLD active (aligned with the rail's dwell 0→11.43%
-                      plus a tiny overshoot so text stays lit until the rail
-                      has finished gliding to the next row)
-       • 13.285 → 14.285%  fade down
-       • 14.285 → 100%  HOLD dim — flanked by identical dim stops so CSS
-                        has nothing to interpolate across the long tail.
-     Linear timing is critical; ease-in-out would smear the hold. */
   @keyframes activate{
     0%        { color: var(--dim);    font-weight:400 }
     1%        { color: var(--bright); font-weight:500 }
@@ -200,13 +180,6 @@
   .item .label { animation: activate    var(--cycle) linear infinite }
   .item .num   { animation: activateNum var(--cycle) linear infinite }
 
-  /* Per-item delays.
-     A negative delay -D means "animation has been running for D seconds at t=0",
-     so it next reaches keyframe-time 0 (the rising edge) at real time cycle-D.
-     For item N to go active at real-time ((N-1)/7)*cycle, we need
-     cycle - D = (N-1)/7 * cycle  →  D = (8-N)/7 * cycle.
-     Item 1 is a special case: D = 0 (already at the rising edge). */
-  /* Use nth-of-type so the sibling .rail <div> doesn't offset the count. */
   .item:nth-of-type(1) .label,
   .item:nth-of-type(1) .num  { animation-delay: calc(var(--cycle) *  0) }
   .item:nth-of-type(2) .label,
@@ -222,17 +195,30 @@
   .item:nth-of-type(7) .label,
   .item:nth-of-type(7) .num  { animation-delay: calc(var(--cycle) * -0.142857) }
 
-  /* ——— Footer meta (bottom-right, quiet) ——— */
   .meta{
     position:absolute;
-    right: clamp(32px, 6vw, 88px);
-    bottom: clamp(22px, 3vw, 36px);
+    right: 7cqw;
+    bottom: 4cqh;
     font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-size:11px;
+    font-size: clamp(8px, 1.8cqw, 11px);
     letter-spacing:.18em;
     color:var(--dim);
     opacity:.55;
     text-transform:uppercase;
+    white-space: nowrap;
+  }
+
+  /* Hide the footer meta on very narrow cards to prevent collision
+     with the bottom list items. */
+  @container card (max-width: 420px){
+    .meta { display: none; }
+    .item { padding-top: clamp(4px, 1.2cqh, 10px); padding-bottom: clamp(4px, 1.2cqh, 10px); }
+  }
+
+  /* On very short cards, shrink vertical padding further. */
+  @container card (max-height: 260px){
+    .card { padding: 4cqh 5cqw; }
+    .item { padding-top: 0.8cqh; padding-bottom: 0.8cqh; }
   }
 
   @media (prefers-reduced-motion: reduce){
