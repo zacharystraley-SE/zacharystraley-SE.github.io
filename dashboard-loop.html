@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Loop</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#11161E;
+    --bg-2:#161C26;
+    --line:#1F2733;
+    --line-2:#262F3D;
+    --gold:#D4AF63;
+    --gold-dim:rgba(212,175,99,.25);
+    --gold-glow:rgba(212,175,99,.12);
+    --gray:#8B8F97;
+    --gray-2:#5A5F69;
+    --text:#E6E8EC;
+    --ok:#D4AF63;
+    /* Master loop. Everything is a fraction of this. */
+    --loop: 7s;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#0B0E13;}
+  body{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Inter',system-ui,sans-serif;
+    padding:32px;
+  }
+
+  /* 16:9 card stage */
+  .stage{
+    position:relative;
+    width:min(100%,1120px);
+    aspect-ratio:16/9;
+    background:var(--bg);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.6),
+               0 0 0 1px rgba(255,255,255,.03);
+    isolation:isolate;
+  }
+
+  /* Subtle grid */
+  .grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(to right, rgba(139,143,151,.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(139,143,151,.05) 1px, transparent 1px);
+    background-size: calc(100%/24) calc(100%/14);
+    mask-image: radial-gradient(ellipse at 50% 55%, #000 55%, transparent 95%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 55%, #000 55%, transparent 95%);
+  }
+  .vignette{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(212,175,99,.05), transparent 40%),
+      radial-gradient(ellipse at 100% 100%, rgba(212,175,99,.04), transparent 45%);
+    pointer-events:none;
+  }
+
+  /* Layout using CSS grid inside the stage */
+  .layout{
+    position:absolute;inset:0;
+    display:grid;
+    grid-template-columns: 1.15fr 1.7fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 2.2%;
+    padding: 3.2% 3.4%;
+  }
+
+  /* Header strip */
+  .header{
+    grid-column: 1 / -1;
+    display:flex;align-items:center;justify-content:space-between;
+    color:var(--gray);
+    font-family:'JetBrains Mono',monospace;
+    font-size: clamp(9px, .95cqw, 13px);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .header .left{display:flex;gap:14px;align-items:center}
+  .pulse{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 0 0 var(--gold-dim);
+    animation: pulse 2.1s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(212,175,99,.45)}
+    70%{box-shadow:0 0 0 8px rgba(212,175,99,0)}
+    100%{box-shadow:0 0 0 0 rgba(212,175,99,0)}
+  }
+  .header .right{display:flex;gap:18px;color:var(--gray-2)}
+  .header .right span.on{color:var(--text)}
+
+  /* Generic panel */
+  .panel{
+    position:relative;
+    background:linear-gradient(180deg, rgba(22,28,38,.6), rgba(22,28,38,.2));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding: 3.2% 3.6%;
+    overflow:hidden;
+  }
+  .panel .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size: clamp(8px,.85cqw,11px);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gray-2);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .panel .label .tag{
+    color:var(--gold);
+    font-size: clamp(7px,.7cqw,10px);
+    border:1px solid var(--gold-dim);
+    padding:2px 6px;border-radius:3px;
+  }
+
+  /* KPI column */
+  .kpis{grid-column:1;grid-row:2 / span 2;display:flex;flex-direction:column;gap: 10px;}
+  .kpi{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+  .kpi .num{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:500;
+    color:var(--text);
+    font-size: clamp(22px, 2.6cqw, 40px);
+    letter-spacing:-.01em;
+    line-height:1;
+    display:flex;align-items:baseline;gap:8px;
+    margin-top: 8px;
+  }
+  .kpi .delta{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--gold);
+    font-size: clamp(10px, 1cqw, 14px);
+    display:inline-flex;align-items:center;gap:4px;
+  }
+  .kpi .delta::before{
+    content:"";
+    width:0;height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-bottom:5px solid var(--gold);
+    display:inline-block;
+    transform:translateY(-1px);
+  }
+  /* Sparkline inside KPI */
+  .spark{
+    width:100%; height: 26%;
+    display:block;
+  }
+  .spark path.line{
+    fill:none;stroke:var(--gold);stroke-width:1.25;
+    stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray: 220;
+    animation: sparkDraw var(--loop) linear infinite;
+  }
+  .spark path.area{
+    fill:url(#sparkFill);
+    opacity:.35;
+    animation: sparkFade var(--loop) linear infinite;
+  }
+  @keyframes sparkDraw{
+    0%   {stroke-dashoffset:220}
+    45%  {stroke-dashoffset:0}
+    92%  {stroke-dashoffset:0; opacity:1}
+    100% {stroke-dashoffset:0; opacity:0}
+  }
+  @keyframes sparkFade{
+    0%,30%{opacity:0}
+    55%{opacity:.35}
+    92%{opacity:.35}
+    100%{opacity:0}
+  }
+
+  /* Hero chart */
+  .hero{grid-column:2;grid-row:2 / span 1;display:flex;flex-direction:column}
+  .hero .chart{
+    flex:1;position:relative;margin-top:10px;
+  }
+  .hero svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+  /* Bar chart panel */
+  .bars{grid-column:3;grid-row:2 / span 1;display:flex;flex-direction:column}
+  .bars .chart{flex:1;display:flex;align-items:flex-end;gap:5.5%;margin-top:14px}
+  .bar{
+    flex:1;
+    background: linear-gradient(180deg, var(--gold) 0%, rgba(212,175,99,.55) 100%);
+    border-radius: 2px 2px 0 0;
+    transform-origin: bottom;
+    animation-duration: var(--loop);
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(.4,0,.2,1);
+    position:relative;
+    min-height: 6%;
+  }
+  .bar.dim{
+    background: linear-gradient(180deg, rgba(139,143,151,.45), rgba(139,143,151,.12));
+  }
+  /* Bar height keyframes — each bar slightly offset so it feels organic, not synchronized */
+  @keyframes barA{0%,100%{height:42%}20%{height:68%}40%{height:55%}60%{height:78%}80%{height:38%}}
+  @keyframes barB{0%,100%{height:58%}18%{height:44%}38%{height:72%}60%{height:50%}82%{height:66%}}
+  @keyframes barC{0%,100%{height:30%}22%{height:55%}44%{height:40%}64%{height:62%}84%{height:48%}}
+  @keyframes barD{0%,100%{height:72%}18%{height:84%}40%{height:62%}62%{height:88%}82%{height:70%}}
+  @keyframes barE{0%,100%{height:48%}20%{height:36%}42%{height:60%}62%{height:44%}84%{height:56%}}
+  @keyframes barF{0%,100%{height:64%}18%{height:80%}38%{height:54%}60%{height:74%}82%{height:60%}}
+  @keyframes barG{0%,100%{height:38%}22%{height:52%}42%{height:34%}64%{height:56%}84%{height:42%}}
+
+  /* Flow / pipeline strip */
+  .flow{
+    grid-column: 2 / span 2;grid-row: 3;
+    display:flex;align-items:center;gap:0;
+    padding: 2.4% 3%;
+  }
+  .flow .label-row{
+    position:absolute;left:3.6%;top:3.2%;right:3.6%;
+    display:flex;justify-content:space-between;
+    font-family:'JetBrains Mono',monospace;
+    font-size: clamp(8px,.82cqw,11px);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gray-2);
+  }
+  .track{
+    position:relative;flex:1;height:46%;
+    display:flex;align-items:center;
+    margin-top: 3%;
+  }
+  .rail{
+    position:absolute;left:0;right:0;top:50%;height:1px;
+    background: repeating-linear-gradient(90deg, var(--line-2) 0 6px, transparent 6px 12px);
+    transform: translateY(-.5px);
+  }
+  .stage-node{
+    position:absolute;top:50%;transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+  }
+  .stage-node .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--bg);
+    border:1px solid var(--gray-2);
+  }
+  .stage-node .name{
+    position:absolute; top:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size: clamp(8px,.75cqw,10px);
+    color:var(--gray-2);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  /* Moving dots */
+  .pill{
+    position:absolute;top:50%;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--gold);
+    box-shadow: 0 0 10px rgba(212,175,99,.55);
+    transform: translate(-50%,-50%);
+    animation-name: flowMove;
+    animation-duration: var(--loop);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    offset-path: none;
+  }
+  @keyframes flowMove{
+    0%   {left:0%;   opacity:0}
+    6%   {opacity:1}
+    94%  {opacity:1}
+    100% {left:100%; opacity:0}
+  }
+
+  /* Hero line draw */
+  .hero-line{
+    fill:none;
+    stroke:var(--gold);
+    stroke-width:1.75;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter: drop-shadow(0 2px 6px rgba(212,175,99,.25));
+    stroke-dasharray: 1400;
+    animation: heroDraw var(--loop) cubic-bezier(.7,0,.3,1) infinite;
+  }
+  @keyframes heroDraw{
+    0%   {stroke-dashoffset: 1400}
+    55%  {stroke-dashoffset: 0}
+    88%  {stroke-dashoffset: 0; opacity:1}
+    98%  {opacity:0}
+    100% {stroke-dashoffset: 0; opacity:0}
+  }
+  .hero-area{
+    fill:url(#heroFill);
+    opacity:0;
+    animation: heroArea var(--loop) cubic-bezier(.7,0,.3,1) infinite;
+  }
+  @keyframes heroArea{
+    0%,15%{opacity:0}
+    55%{opacity:.55}
+    88%{opacity:.55}
+    100%{opacity:0}
+  }
+  /* Travelling dot on the hero line */
+  .hero-dot{
+    fill:var(--gold);
+    filter: drop-shadow(0 0 6px rgba(212,175,99,.8));
+    offset-path: path('M 0,220 C 60,190 110,205 160,170 C 220,128 260,145 320,112 C 380,78 430,96 490,70 C 560,40 620,60 700,50 C 770,42 820,36 900,28');
+    offset-rotate: 0deg;
+    animation: heroDot var(--loop) cubic-bezier(.7,0,.3,1) infinite;
+  }
+  @keyframes heroDot{
+    0%   {offset-distance:0%;   opacity:0}
+    8%   {opacity:1}
+    55%  {offset-distance:100%; opacity:1}
+    88%  {offset-distance:100%; opacity:1}
+    100% {offset-distance:100%; opacity:0}
+  }
+  /* y-axis ticks */
+  .ytick{stroke:var(--line-2); stroke-width:1; stroke-dasharray:2 4;}
+  .yaxis-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; fill:var(--gray-2); letter-spacing:.08em;
+  }
+
+  /* Digit roller — vertical strip of digits, translated by % to show one digit */
+  .roller{
+    display:inline-block; height:1em; overflow:hidden;
+    vertical-align: baseline;
+    line-height:1;
+  }
+  .roller .strip{
+    display:flex; flex-direction:column; line-height:1;
+    animation-duration: var(--loop);
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(.5,.05,.2,1);
+  }
+  .roller .strip > span{height:1em;display:block}
+
+  /* Each roller animates through a sequence that lands on a final digit and holds */
+  /* Strip has 11 children (0..9, plus repeat of final digit for loop continuity).
+     We'll use keyframes that move from start digit → final digit over ~50% of loop,
+     hold, then instant reset via the duplicate. */
+  @keyframes roll0{0%{transform:translateY(-20%)}55%{transform:translateY(-0%)}92%{transform:translateY(-0%)}100%{transform:translateY(-0%)}}
+  @keyframes roll1{0%{transform:translateY(-80%)}55%{transform:translateY(-10%)}92%{transform:translateY(-10%)}100%{transform:translateY(-10%)}}
+  @keyframes roll2{0%{transform:translateY(-30%)}55%{transform:translateY(-80%)}92%{transform:translateY(-80%)}100%{transform:translateY(-80%)}}
+  @keyframes roll3{0%{transform:translateY(-60%)}55%{transform:translateY(-30%)}92%{transform:translateY(-30%)}100%{transform:translateY(-30%)}}
+  @keyframes roll4{0%{transform:translateY(-10%)}55%{transform:translateY(-90%)}92%{transform:translateY(-90%)}100%{transform:translateY(-90%)}}
+  @keyframes roll5{0%{transform:translateY(-40%)}55%{transform:translateY(-70%)}92%{transform:translateY(-70%)}100%{transform:translateY(-70%)}}
+
+  /* Scanning horizontal line on hero (adds "live" feel) */
+  .scan{
+    position:absolute;left:0;right:0;top:0;height:1px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,99,.4), transparent);
+    animation: scanMove var(--loop) linear infinite;
+    opacity:.7;
+  }
+  @keyframes scanMove{
+    0%{transform:translateY(10%);opacity:0}
+    10%{opacity:.7}
+    90%{opacity:.7}
+    100%{transform:translateY(95%);opacity:0}
+  }
+
+  /* Tickers in header right */
+  .tick{
+    display:inline-block; min-width: 3.5em; text-align:right;
+    color:var(--text);
+  }
+  .blink{animation:blink 1.2s steps(2) infinite}
+  @keyframes blink{50%{opacity:.35}}
+</style>
+</head>
+<body>
+
+<div class="stage" role="img" aria-label="Live BI dashboard animation">
+  <div class="grid"></div>
+  <div class="vignette"></div>
+
+  <div class="layout">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="left">
+        <span class="pulse"></span>
+        <span style="color:var(--text)">Flow Analytics</span>
+        <span>/</span>
+        <span>Live</span>
+      </div>
+      <div class="right">
+        <span>24H</span><span class="on">7D</span><span>30D</span><span>QTD</span>
+        <span style="color:var(--gold);margin-left:6px" class="blink">● REC</span>
+      </div>
+    </div>
+
+    <!-- KPI COLUMN -->
+    <div class="kpis">
+
+      <div class="panel kpi">
+        <div class="label"><span>Customers Served</span><span class="tag">+14.2%</span></div>
+        <div class="num">
+          1,<span class="roller"><span class="strip" style="animation-name:roll4">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>8</span>
+          </span></span><span class="roller"><span class="strip" style="animation-name:roll5">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>7</span>
+          </span></span><span class="roller"><span class="strip" style="animation-name:roll3">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>3</span>
+          </span></span>
+          <span class="delta">vs prev</span>
+        </div>
+        <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D4AF63" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#D4AF63" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path class="area" d="M0,30 L15,26 L30,28 L45,22 L60,24 L75,18 L90,20 L105,14 L120,17 L135,10 L150,13 L165,8 L180,11 L200,6 L200,40 L0,40 Z"/>
+          <path class="line" d="M0,30 L15,26 L30,28 L45,22 L60,24 L75,18 L90,20 L105,14 L120,17 L135,10 L150,13 L165,8 L180,11 L200,6"/>
+        </svg>
+      </div>
+
+      <div class="panel kpi">
+        <div class="label"><span>Avg Wait (min)</span><span class="tag" style="color:#8B8F97;border-color:rgba(139,143,151,.3)">−2.8%</span></div>
+        <div class="num">
+          <span class="roller"><span class="strip" style="animation-name:roll0">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span>
+          </span></span><span class="roller"><span class="strip" style="animation-name:roll4">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>8</span>
+          </span></span><span style="color:var(--gray-2)">.</span><span class="roller"><span class="strip" style="animation-name:roll2">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+            <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>7</span>
+          </span></span>
+          <span class="delta" style="color:var(--gray)">steady</span>
+        </div>
+        <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none">
+          <path class="area" d="M0,16 L20,18 L40,14 L60,20 L80,16 L100,22 L120,18 L140,24 L160,20 L180,26 L200,22 L200,40 L0,40 Z"/>
+          <path class="line" d="M0,16 L20,18 L40,14 L60,20 L80,16 L100,22 L120,18 L140,24 L160,20 L180,26 L200,22"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- HERO AREA CHART -->
+    <div class="panel hero">
+      <div class="label">
+        <span>Throughput · Last 7 Days</span>
+        <span class="tag">REAL-TIME</span>
+      </div>
+      <div class="chart">
+        <svg viewBox="0 0 900 240" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="heroFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D4AF63" stop-opacity=".5"/>
+              <stop offset="100%" stop-color="#D4AF63" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- y-axis dashed ticks -->
+          <line class="ytick" x1="0" y1="60"  x2="900" y2="60"/>
+          <line class="ytick" x1="0" y1="120" x2="900" y2="120"/>
+          <line class="ytick" x1="0" y1="180" x2="900" y2="180"/>
+
+          <!-- Area fill (same path, closed) -->
+          <path class="hero-area"
+                d="M 0,220 C 60,190 110,205 160,170 C 220,128 260,145 320,112 C 380,78 430,96 490,70 C 560,40 620,60 700,50 C 770,42 820,36 900,28 L 900,240 L 0,240 Z"/>
+          <!-- Stroke path -->
+          <path class="hero-line"
+                d="M 0,220 C 60,190 110,205 160,170 C 220,128 260,145 320,112 C 380,78 430,96 490,70 C 560,40 620,60 700,50 C 770,42 820,36 900,28"/>
+          <!-- Travelling pulse dot — positioned with offset-path -->
+        </svg>
+        <div style="position:absolute;inset:0">
+          <svg viewBox="0 0 900 240" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+            <circle class="hero-dot" r="4"/>
+          </svg>
+        </div>
+        <div class="scan"></div>
+      </div>
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="panel bars">
+      <div class="label">
+        <span>By Stage</span>
+        <span style="color:var(--gray-2);font-family:'JetBrains Mono',monospace;font-size: clamp(8px,.78cqw,10px)">HRLY</span>
+      </div>
+      <div class="chart">
+        <div class="bar"     style="animation-name:barA"></div>
+        <div class="bar"     style="animation-name:barB; animation-delay: -.4s"></div>
+        <div class="bar dim" style="animation-name:barC; animation-delay: -.9s"></div>
+        <div class="bar"     style="animation-name:barD; animation-delay: -1.3s"></div>
+        <div class="bar"     style="animation-name:barE; animation-delay: -1.7s"></div>
+        <div class="bar dim" style="animation-name:barF; animation-delay: -2.2s"></div>
+        <div class="bar"     style="animation-name:barG; animation-delay: -2.6s"></div>
+      </div>
+    </div>
+
+    <!-- FLOW PIPELINE -->
+    <div class="panel flow">
+      <div class="label-row">
+        <span>Pipeline</span>
+        <span>In-flight · <span style="color:var(--gold)">27</span></span>
+      </div>
+      <div class="track">
+        <div class="rail"></div>
+        <!-- Nodes -->
+        <div class="stage-node" style="left:0%">   <div class="dot"></div><div class="name">Arrive</div></div>
+        <div class="stage-node" style="left:25%">  <div class="dot"></div><div class="name">Queue</div></div>
+        <div class="stage-node" style="left:50%">  <div class="dot"></div><div class="name">Serve</div></div>
+        <div class="stage-node" style="left:75%">  <div class="dot"></div><div class="name">Review</div></div>
+        <div class="stage-node" style="left:100%"> <div class="dot"></div><div class="name">Done</div></div>
+
+        <!-- Moving pills, staggered -->
+        <div class="pill" style="animation-delay:  0s"></div>
+        <div class="pill" style="animation-delay: -1.4s"></div>
+        <div class="pill" style="animation-delay: -2.8s"></div>
+        <div class="pill" style="animation-delay: -4.2s"></div>
+        <div class="pill" style="animation-delay: -5.6s"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
