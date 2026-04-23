@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* =========================================================================
-     COLOR PALETTE / YESTER ZONE / CREATIVE SIDE PROJECT (yesterzone.html)
+     COLOR PALETTE / YESTER ZONE /  CREATIVE SIDE PROJECT (yesterzone.html)
      =========================================================================
      This is the control panel for every color on your Yester Zone page.
      Change a hex code here and it updates EVERYWHERE on this page.
@@ -424,10 +424,13 @@
     gap: 32px;
   }
 
-  .video-card {
-    cursor: pointer;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+ .video-card {
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
 
   .video-card.featured { grid-column: span 4; }
   .video-card.regular { grid-column: span 3; }
@@ -774,7 +777,7 @@
 
     <div class="video-grid">
 
-      <div class="video-card featured">
+      <a class="video-card featured" href="https://www.youtube.com/watch?v=BBbEatZgRBQ" target="_blank" rel="noopener">
         <div class="video-frame">
           <div class="video-tape-label">EP.01</div>
           <img class="video-thumb-img"
@@ -791,9 +794,9 @@
           <span>2023</span>
         </div>
         <div class="video-desc">    A short documentary exploring Parksville, New York—a small Catskills town once home to some of the region’s most iconic resorts, now left behind </div>
-      </div>
+      </a>
 
-      <div class="video-card small">
+      <a class="video-card small" href="https://www.youtube.com/watch?v=iQRZwD7uRS4" target="_blank" rel="noopener">
         <div class="video-frame">
           <div class="video-tape-label">EP.02</div>
           <img class="video-thumb-img"
@@ -808,7 +811,7 @@
           <span>AMUSEMENT</span>
         </div>
         <div class="video-desc"> A documentary about one of the coolest places I have ever found in the forests of Ohio...   </div>
-      </div>
+      </a>
 
       <div class="video-card regular">
         <div class="video-frame">
