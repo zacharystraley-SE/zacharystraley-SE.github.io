@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Product Tour — Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#11161E;
+    --gold:#D4AF63;
+    --dim:#8B8F97;
+    --bright:#E6E8EC;
+    --items:7;
+    --step:1.05s;              /* per-item dwell */
+    --cycle: calc(var(--step) * var(--items));  /* total loop */
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;width:100%;background:var(--bg);overflow:hidden}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    color:var(--dim);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .card{
+    position:relative;
+    width:100%;
+    height:100%;
+    padding: clamp(28px, 5.2vw, 72px) clamp(32px, 6vw, 88px);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ——— Top-of-card progress rail (full width, hairline) ——— */
+  .progress{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:1px;
+    background:rgba(139,143,151,.12);
+  }
+  .progress::after{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:100%;
+    background:linear-gradient(90deg, transparent, var(--gold) 40%, var(--gold) 60%, transparent);
+    transform-origin:left center;
+    animation: sweep var(--cycle) linear infinite;
+  }
+  @keyframes sweep{
+    0%   { transform: scaleX(0); opacity:.9 }
+    98%  { transform: scaleX(1); opacity:.9 }
+    100% { transform: scaleX(1); opacity:0 }
+  }
+
+  /* ——— Eyebrow: "PRODUCT TOUR" + pulsing dot ——— */
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.22em;
+    color:var(--dim);
+    text-transform:uppercase;
+    opacity:.75;
+  }
+  .dot{
+    width:6px;height:6px;border-radius:999px;
+    background:var(--gold);
+    box-shadow:0 0 0 0 rgba(212,175,99,.55);
+    animation: pulse 1.6s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%   { box-shadow:0 0 0 0 rgba(212,175,99,.55); opacity:1 }
+    70%  { box-shadow:0 0 0 10px rgba(212,175,99,0); opacity:.85 }
+    100% { box-shadow:0 0 0 0 rgba(212,175,99,0); opacity:1 }
+  }
+
+  /* ——— List ——— */
+  .list-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    margin-top: clamp(16px, 2.4vw, 28px);
+  }
+  .list{
+    position:relative;
+    width:100%;
+    max-width:720px;
+    list-style:none;
+  }
+
+  /* The travelling gold rail.
+     Each item gets a 1/7 slot. Inside each slot the rail dwells ~80% then
+     glides to the next position over the last ~20%.
+     Dwell window aligns with the text's bright hold; the glide finishes
+     exactly as the next item's bright hold begins. */
+  .rail{
+    position:absolute;
+    left:0;
+    top:0;
+    width:2px;
+    height: calc(100% / var(--items));
+    background:var(--gold);
+    border-radius:2px;
+    box-shadow:0 0 14px rgba(212,175,99,.35);
+    animation: rail var(--cycle) linear infinite,
+               railFade var(--cycle) linear infinite;
+  }
+  @keyframes rail{
+    /* Slot 1: 0–14.2857%   dwell 0–11.43%, glide 11.43→14.29  */
+    0%       { transform: translateY(0%)   }
+    11.428%  { transform: translateY(0%)   }
+    14.285%  { transform: translateY(100%) }
+    /* Slot 2 */
+    25.714%  { transform: translateY(100%) }
+    28.571%  { transform: translateY(200%) }
+    /* Slot 3 */
+    40.000%  { transform: translateY(200%) }
+    42.857%  { transform: translateY(300%) }
+    /* Slot 4 */
+    54.285%  { transform: translateY(300%) }
+    57.142%  { transform: translateY(400%) }
+    /* Slot 5 */
+    68.571%  { transform: translateY(400%) }
+    71.428%  { transform: translateY(500%) }
+    /* Slot 6 */
+    82.857%  { transform: translateY(500%) }
+    85.714%  { transform: translateY(600%) }
+    /* Slot 7 — dwell, then snap back via opacity trick handled by restart */
+    97.142%  { transform: translateY(600%) }
+    100%     { transform: translateY(600%) }
+  }
+  /* Fade the rail briefly at the loop boundary so the jump from slot 7 back
+     to slot 1 isn't visible. */
+  @keyframes railFade{
+    0%, 2%      { opacity: 1 }
+    97%, 99%    { opacity: 1 }
+    99.5%       { opacity: 0 }
+    100%        { opacity: 0 }
+  }
+
+  .item{
+    position:relative;
+    display:grid;
+    grid-template-columns: 64px 1fr;
+    align-items:center;
+    gap: clamp(18px, 2.4vw, 32px);
+    padding: clamp(10px, 1.4vw, 16px) 0 clamp(10px, 1.4vw, 16px) clamp(20px, 2.2vw, 28px);
+  }
+  .num{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size: clamp(13px, 1.05vw, 15px);
+    letter-spacing:.04em;
+    color:var(--dim);
+    /* no CSS transition — the keyframe animation drives color entirely,
+       otherwise the transition smears between keyframe stops. */
+  }
+  .label{
+    font-size: clamp(18px, 1.7vw, 24px);
+    font-weight:400;
+    letter-spacing:-.005em;
+    color:var(--dim);
+  }
+
+  /* Per-item active keyframes.
+     Each item owns a 1/7 slot (14.285% of cycle). Inside its slot:
+       • 0 → 1%       fade up
+       • 1 → 13.285%  HOLD active (aligned with the rail's dwell 0→11.43%
+                      plus a tiny overshoot so text stays lit until the rail
+                      has finished gliding to the next row)
+       • 13.285 → 14.285%  fade down
+       • 14.285 → 100%  HOLD dim — flanked by identical dim stops so CSS
+                        has nothing to interpolate across the long tail.
+     Linear timing is critical; ease-in-out would smear the hold. */
+  @keyframes activate{
+    0%        { color: var(--dim);    font-weight:400 }
+    1%        { color: var(--bright); font-weight:500 }
+    11.428%   { color: var(--bright); font-weight:500 }
+    14.285%   { color: var(--dim);    font-weight:400 }
+    99%       { color: var(--dim);    font-weight:400 }
+    100%      { color: var(--dim);    font-weight:400 }
+  }
+  @keyframes activateNum{
+    0%        { color: var(--dim) }
+    1%        { color: var(--gold) }
+    11.428%   { color: var(--gold) }
+    14.285%   { color: var(--dim) }
+    99%       { color: var(--dim) }
+    100%      { color: var(--dim) }
+  }
+
+  .item .label { animation: activate    var(--cycle) linear infinite }
+  .item .num   { animation: activateNum var(--cycle) linear infinite }
+
+  /* Per-item delays.
+     A negative delay -D means "animation has been running for D seconds at t=0",
+     so it next reaches keyframe-time 0 (the rising edge) at real time cycle-D.
+     For item N to go active at real-time ((N-1)/7)*cycle, we need
+     cycle - D = (N-1)/7 * cycle  →  D = (8-N)/7 * cycle.
+     Item 1 is a special case: D = 0 (already at the rising edge). */
+  /* Use nth-of-type so the sibling .rail <div> doesn't offset the count. */
+  .item:nth-of-type(1) .label,
+  .item:nth-of-type(1) .num  { animation-delay: calc(var(--cycle) *  0) }
+  .item:nth-of-type(2) .label,
+  .item:nth-of-type(2) .num  { animation-delay: calc(var(--cycle) * -0.857142) }
+  .item:nth-of-type(3) .label,
+  .item:nth-of-type(3) .num  { animation-delay: calc(var(--cycle) * -0.714285) }
+  .item:nth-of-type(4) .label,
+  .item:nth-of-type(4) .num  { animation-delay: calc(var(--cycle) * -0.571428) }
+  .item:nth-of-type(5) .label,
+  .item:nth-of-type(5) .num  { animation-delay: calc(var(--cycle) * -0.428571) }
+  .item:nth-of-type(6) .label,
+  .item:nth-of-type(6) .num  { animation-delay: calc(var(--cycle) * -0.285714) }
+  .item:nth-of-type(7) .label,
+  .item:nth-of-type(7) .num  { animation-delay: calc(var(--cycle) * -0.142857) }
+
+  /* ——— Footer meta (bottom-right, quiet) ——— */
+  .meta{
+    position:absolute;
+    right: clamp(32px, 6vw, 88px);
+    bottom: clamp(22px, 3vw, 36px);
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--dim);
+    opacity:.55;
+    text-transform:uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="card" role="img" aria-label="Auto-playing product tour stepping through 7 modules">
+
+    <div class="progress" aria-hidden="true"></div>
+
+    <div class="eyebrow">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Product Tour</span>
+    </div>
+
+    <div class="list-wrap">
+      <ul class="list">
+        <div class="rail" aria-hidden="true"></div>
+        <li class="item"><span class="num">01</span><span class="label">Portal</span></li>
+        <li class="item"><span class="num">02</span><span class="label">Appointment Booking</span></li>
+        <li class="item"><span class="num">03</span><span class="label">Resource Planning</span></li>
+        <li class="item"><span class="num">04</span><span class="label">Check-In &amp; Visit Management</span></li>
+        <li class="item"><span class="num">05</span><span class="label">Serving Customers</span></li>
+        <li class="item"><span class="num">06</span><span class="label">Operations Monitoring</span></li>
+        <li class="item"><span class="num">07</span><span class="label">Reporting</span></li>
+      </ul>
+    </div>
+
+    <div class="meta">7 Chapters · Auto</div>
+  </div>
+</body>
+</html>
