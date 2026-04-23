@@ -10,43 +10,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* =========================================================================
-     COLOR PALETTE — YESTER ZONE / CREATIVE SIDE PROJECT (yesterzone.html)
+     COLOR PALETTE / YESTER ZONE / CREATIVE SIDE PROJECT (yesterzone.html)
      =========================================================================
      This is the control panel for every color on your Yester Zone page.
      Change a hex code here and it updates EVERYWHERE on this page.
 
      These colors are INTENTIONALLY different from your main portfolio.
      The main portfolio (index.html) uses cool navy + gold for corporate
-     polish. This page uses warm brown + amber for a nostalgic, retro feel.
+     polish. This page uses a 5-color vintage Americana palette: blackcurrant
+     purple, prairie sand rust, persian plum burgundy, tom thumb green,
+     and anzac gold. Think faded travel poster, old National Geographic.
 
      NOTE: Changing colors here does NOT affect your main portfolio page.
      The two pages have separate palettes on purpose.
+
+     PALETTE SOURCE:
+       #DEA450  anzac          (gold)
+       #9B461F  prairie sand   (burnt orange rust)
+       #6A1D2F  persian plum   (wine burgundy)
+       #354C3C  tom thumb      (forest green)
+       #42354C  blackcurrant   (dusty dark purple)
      ========================================================================= */
   :root {
     /* --bg is the MAIN BACKGROUND COLOR of the Yester Zone page.
-       Currently a warm, dark brown (like an old tube TV cabinet). */
-    --bg: #1A1410;
+       Currently blackcurrant, a deep dusty purple. Reads like old velvet
+       theater curtains or the spine of a forgotten library book. */
+    --bg: #42354C;
 
-    /* --bg-deep is an even DARKER BROWN used inside video frames and
-       the "manifesto" box. Adds depth so elements feel inset. */
-    --bg-deep: #0F0B08;
+    /* --bg-deep is an even DARKER version of the background, used inside
+       video frames and the "manifesto" box. Adds depth so elements feel
+       inset into the page. */
+    --bg-deep: #2A2130;
 
-    /* --bg-elevated is slightly LIGHTER than --bg, used for gradient effects
-       in the video placeholder thumbnails. */
-    --bg-elevated: #231C16;
+    /* --bg-elevated is slightly LIGHTER than --bg, used for gradient
+       effects in the video placeholder thumbnails. */
+    --bg-elevated: #534463;
 
-    /* --text is the MAIN TEXT COLOR — headlines, body copy.
-       Currently a warm cream/parchment. Feels like old paper. */
+    /* --text is the MAIN TEXT COLOR for headlines and body copy.
+       Warm cream/parchment. Reads like old paper on dark purple. */
     --text: #E8D9BF;
 
-    /* --text-dim is SECONDARY TEXT — descriptions, meta info. */
-    --text-dim: #9A8870;
+    /* --text-dim is SECONDARY TEXT for descriptions and meta info. */
+    --text-dim: #A89A7E;
 
-    /* --text-faint is the FAINTEST TEXT — placeholder labels, timestamps. */
-    --text-faint: #5A4E3E;
+    /* --text-faint is the FAINTEST TEXT for placeholder labels and
+       timestamps. Tinted slightly purple to match the new background. */
+    --text-faint: #6B5C78;
 
-    /* --amber is THE PRIMARY ACCENT COLOR for this page.
-       Think: warm golden light from a tube TV or sunset. It's used for:
+    /* --amber is THE PRIMARY ACCENT COLOR for this page (anzac gold
+       from the palette). Think: warm golden light from a tube TV or
+       a 70s sunset. It's used for:
        - The italicized word "Yester" in the huge title
        - The "REC" indicator in the TV badge
        - Video tape labels (EP.01, NEW, COMING)
@@ -56,25 +69,32 @@
        Suggested alternatives:
          #E5A84A (brighter gold)     #C47C3C (deeper orange)
          #B8956A (muted tan)         #9CAF88 (sage green) */
-    --amber: #D4A04A;
+    --amber: #DEA450;
 
-    /* --rust is the SECONDARY ACCENT — a warm reddish-brown.
-       Used sparingly for: the blinking REC dot, the secondary button
-       ("See the films"), marquee star accents.
+    /* --rust is the SECONDARY ACCENT (prairie sand from the palette),
+       a warm burnt orange. Used sparingly for: the blinking REC dot,
+       the secondary button ("See the films"), marquee star accents.
        This should complement --amber, not compete with it. */
-    --rust: #B85A3B;
+    --rust: #9B461F;
 
-    /* --olive is a THIRD ACCENT that's reserved for future use.
-       Currently not heavily used on the page. Safe to leave alone. */
-    --olive: #7A8560;
+    /* --olive is tom thumb green from the palette, a deep forest green.
+       Currently reserved for future use. Safe to leave alone, but
+       available if you want a third accent. */
+    --olive: #354C3C;
+
+    /* --plum is persian plum from the palette, a rich wine burgundy.
+       Currently reserved for future use. Pairs well with --amber
+       if you ever want to introduce a moodier accent on specific
+       elements (borders, hover states, etc). */
+    --plum: #6A1D2F;
 
     /* --line is the color of THIN DIVIDER LINES around video cards,
        between sections, and in the stats grid. Very subtle by design. */
-    --line: #2E241B;
+    --line: #3A2D44;
 
     /* --line-bright is a slightly brighter line color for hover states
        and card borders. */
-    --line-bright: #4A3A2A;
+    --line-bright: #58486A;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -145,11 +165,11 @@
     90% { transform: translate(10%, 5%); }
   }
 
-  /* CRT glow tint */
+  /* CRT glow tint (uses new amber + rust) */
   .crt-tint {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(212, 160, 74, 0.03) 50%, rgba(184, 90, 59, 0.05) 100%);
+    background: radial-gradient(circle at center, transparent 0%, rgba(222, 164, 80, 0.03) 50%, rgba(155, 70, 31, 0.05) 100%);
     pointer-events: none;
     z-index: 1;
   }
@@ -174,7 +194,7 @@
     justify-content: space-between;
     align-items: center;
     backdrop-filter: blur(8px);
-    background: rgba(26, 20, 16, 0.8);
+    background: rgba(66, 53, 76, 0.8);
     border-bottom: 1px solid var(--line);
   }
 
@@ -237,7 +257,7 @@
     letter-spacing: 0.2em;
     margin-bottom: 60px;
     width: fit-content;
-    background: rgba(212, 160, 74, 0.04);
+    background: rgba(222, 164, 80, 0.04);
     opacity: 0;
     animation: fadeIn 1s ease 0.3s forwards;
   }
@@ -338,7 +358,7 @@
     padding: 16px 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
-    background: rgba(212, 160, 74, 0.03);
+    background: rgba(222, 164, 80, 0.03);
     white-space: nowrap;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -424,7 +444,7 @@
     margin-bottom: 20px;
     box-shadow:
       inset 0 0 80px rgba(0,0,0,0.6),
-      0 0 0 1px rgba(212, 160, 74, 0.1);
+      0 0 0 1px rgba(222, 164, 80, 0.1);
   }
 
   .video-frame::before {
@@ -444,8 +464,8 @@
       to bottom,
       transparent 0,
       transparent 3px,
-      rgba(255, 200, 120, 0.04) 3px,
-      rgba(255, 200, 120, 0.04) 4px
+      rgba(222, 164, 80, 0.04) 3px,
+      rgba(222, 164, 80, 0.04) 4px
     );
     z-index: 3;
     pointer-events: none;
@@ -459,7 +479,7 @@
     justify-content: center;
     flex-direction: column;
     gap: 12px;
-    background: linear-gradient(135deg, #231C16, #1A1410);
+    background: linear-gradient(135deg, var(--bg-elevated), var(--bg));
     color: var(--text-faint);
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -495,7 +515,7 @@
     bottom: 12px;
     right: 12px;
     z-index: 4;
-    background: rgba(15, 11, 8, 0.85);
+    background: rgba(42, 33, 48, 0.85);
     border: 1px solid var(--line-bright);
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
@@ -753,7 +773,7 @@
           </div>
           <div class="video-views">150K+ VIEWS</div>
         </div>
-        <div class="video-title">Parksville, Kentucky</div>
+        <div class="video-title">Parksville, New York</div>
         <div class="video-meta">
           <span>EP.01</span>
           <span class="dot">✦</span>
@@ -761,7 +781,7 @@
           <span class="dot">✦</span>
           <span>2023</span>
         </div>
-        <div class="video-desc">The first breakout. A small Kentucky town swallowed by a reservoir, and the people who still visit what's left above water.</div>
+        <div class="video-desc">    A short documentary exploring Parksville, New York—a small Catskills town once home to some of the region’s most iconic resorts, now left behind </div>
       </div>
 
       <div class="video-card small">
