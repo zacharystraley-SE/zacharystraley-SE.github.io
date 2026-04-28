@@ -388,6 +388,73 @@
     color: var(--accent);
     font-size: 20px;
   }
+
+  /* Case study card variant */
+  .work-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .case-study-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .case-study-thumb::before { display: none; }
+  .case-study-label {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--accent);
+    padding: 3px 8px;
+  }
+  .mini-timeline {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+  }
+  .mini-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .mini-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+  }
+  .mini-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .mini-line {
+    flex: 1;
+    height: 1px;
+    background: var(--line-bright);
+    margin-bottom: 18px;
+  }
+  
 /* Live demo card (Cadence OS Dashboard) */
 .work-thumb.live-demo {
   padding: 0;
@@ -759,22 +826,35 @@
         </div>
       </a>
 
-      <div class="work-item small">
-        <div class="work-thumb">
-          <div class="work-thumb-placeholder">PLACEHOLDER — FIFA Submission</div>
+    <a href="fifa.html" class="work-item small work-item-link">
+        <div class="work-thumb case-study-thumb">
+          <div class="case-study-label">Case Study</div>
+          <div class="mini-timeline">
+            <div class="mini-step"><div class="mini-dot">I</div><div class="mini-label">Brief</div></div>
+            <div class="mini-line"></div>
+            <div class="mini-step"><div class="mini-dot">II</div><div class="mini-label">Strategy</div></div>
+            <div class="mini-line"></div>
+            <div class="mini-step"><div class="mini-dot">III</div><div class="mini-label">Script</div></div>
+            <div class="mini-line"></div>
+            <div class="mini-step"><div class="mini-dot">IV</div><div class="mini-label">Prod</div></div>
+            <div class="mini-line"></div>
+            <div class="mini-step"><div class="mini-dot">V</div><div class="mini-label">Post</div></div>
+            <div class="mini-line"></div>
+            <div class="mini-step"><div class="mini-dot">VI</div><div class="mini-label">Deliver</div></div>
+          </div>
         </div>
         <div class="work-meta">
           <div class="work-info">
-            <div class="work-category">Vendor Pitch / Sports</div>
-            <div class="work-title">FIFA Partner Submission</div>
-            <div class="work-desc">Qualifying video that secured a vendor slot and contributed to a seven-figure contract for 2026 World Cup volunteer services.</div>
+            <div class="work-category">Case Study / Process Walkthrough</div>
+            <div class="work-title">How I produced the video that helped win a $1.5M FIFA contract</div>
+            <div class="work-desc">A breakdown of the video submission for FIFA's RFP for queuing services at the 2026 World Cup. The video belongs to my former employer. This is a walkthrough of how I made it.</div>
             <div class="work-tags">
-              <span class="tag">Pitch</span>
-              <span class="tag">Deal Support</span>
+              <span class="tag">Sales Engineering</span>
+              <span class="tag">Video Production</span>
             </div>
           </div>
         </div>
-      </div>
+      </a>
 
       <div class="work-item third">
         <div class="work-thumb">
