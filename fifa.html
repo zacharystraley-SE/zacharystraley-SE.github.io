@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I produced the video that helped win a $1.5M FIFA contract — Zach Straley</title>
+<meta name="description" content="A walkthrough of the video submission I produced for FIFA's open RFP for queuing services at the 2026 World Cup.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================================
+     COLOR PALETTE — FIFA CASE STUDY (fifa.html)
+     =========================================================================
+     This page inherits the same palette as index.html so it feels like a
+     natural sub-page of the main portfolio, not a separate brand like
+     Yester Zone. If you change colors in index.html, update here too.
+     ========================================================================= */
+  :root {
+    --bg: #0A0E13;
+    --bg-elevated: #11161E;
+    --bg-deep: #060A0E;
+    --text: #E8E5DE;
+    --text-dim: #8B8F97;
+    --text-faint: #4A4E57;
+    --accent: #D4AF63;
+    --accent-dim: #8A7340;
+    --line: #1C222C;
+    --line-bright: #2A3240;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    background: rgba(10, 14, 19, 0.7);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .back-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--accent); }
+  .back-link::before { content: '← '; }
+
+  /* HERO */
+  .hero {
+    min-height: 90vh;
+    padding-top: 140px;
+    padding-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hero-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: clamp(40px, 6.5vw, 88px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 36px;
+    max-width: 1200px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .hero-sub {
+    max-width: 720px;
+    font-size: clamp(17px, 1.55vw, 20px);
+    line-height: 1.6;
+    color: var(--text-dim);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  /* PROGRESS RAIL */
+  .progress-rail {
+    position: fixed;
+    top: 50%;
+    right: 32px;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .progress-rail.active { opacity: 1; }
+
+  .progress-dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--line-bright);
+    background: var(--bg);
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .progress-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .progress-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.5);
+  }
+
+  .progress-dot.active::after { opacity: 1; }
+  .progress-dot.passed {
+    background: var(--accent-dim);
+    border-color: var(--accent-dim);
+  }
+
+  /* STEPS */
+  .step {
+    padding: 120px 0;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--line);
+  }
+
+  .step-inner {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .step-text {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .step-visual {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+  }
+
+  .step.visible .step-text,
+  .step.visible .step-visual {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .step-number {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: clamp(60px, 9vw, 130px);
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    opacity: 0.9;
+  }
+
+  .step-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 20px;
+  }
+
+  .step-kicker .num { color: var(--accent); margin-right: 10px; }
+
+  .step-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+
+  .step-body {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  .step-body p { margin-bottom: 16px; }
+  .step-body p:last-child { margin-bottom: 0; }
+  .step-body strong { color: var(--text); font-weight: 500; }
+
+  /* STEP VISUALS — SHARED */
+  .visual-frame {
+    aspect-ratio: 4/3;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line-bright);
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .visual-frame::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* Visual 1: Customer journey winding path */
+  .v1 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+  }
+  .v1-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    text-align: center;
+  }
+  .v1-svg-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .v1-svg {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+  }
+
+  /* Visual 2: YouTube stats */
+  .v2 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .v2-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line-bright);
+    border: 1px solid var(--line-bright);
+  }
+  .v2-stat {
+    background: var(--bg-deep);
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .v2-stat-num {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: clamp(22px, 2.4vw, 32px);
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .v2-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .v2-source {
+    margin-top: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+  }
+
+  /* Visual 3: Scripting layers */
+  .v3 { display: flex; flex-direction: column; gap: 14px; height: 100%; justify-content: center; }
+  .v3-doc {
+    padding: 14px 18px;
+    border: 1px solid var(--line-bright);
+    background: var(--bg-deep);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .v3-doc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+  }
+  .v3-line { height: 4px; background: var(--line-bright); }
+  .v3-line.full { width: 100%; }
+  .v3-line.md { width: 78%; }
+  .v3-line.sm { width: 58%; }
+  .v3-line.xs { width: 38%; }
+
+  /* Visual 4: DaVinci timeline */
+  .v4 { height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  .v4-track { display: flex; flex-direction: column; gap: 5px; }
+  .v4-track-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .v4-track-bar {
+    height: 22px; background: var(--bg-deep);
+    border: 1px solid var(--line); position: relative; display: flex;
+  }
+  .v4-clip { background: var(--accent); height: 100%; opacity: 0.85; border-right: 1px solid var(--bg); }
+  .v4-clip.dim { background: var(--accent-dim); opacity: 0.55; }
+  .v4-waveform { display: flex; align-items: center; gap: 1px; padding: 0 4px; width: 100%; height: 100%; }
+  .v4-waveform span { flex: 1; background: var(--accent); opacity: 0.75; }
+
+  /* Visual 5: Post-production effects stack (placeholder) */
+  .v5 { display: flex; flex-direction: column; gap: 8px; height: 100%; justify-content: center; }
+  .v5-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 14px; border: 1px solid var(--line-bright); background: var(--bg-deep);
+  }
+  .v5-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--text); letter-spacing: 0.08em; text-transform: uppercase;
+    width: 140px; flex-shrink: 0;
+  }
+  .v5-fill { flex: 1; height: 6px; background: var(--line-bright); position: relative; }
+  .v5-fill::after {
+    content: ''; position: absolute; left: 0; top: 0; height: 100%;
+    background: var(--accent);
+  }
+  .v5-fill.p90::after { width: 90%; }
+  .v5-fill.p80::after { width: 80%; }
+  .v5-fill.p75::after { width: 75%; }
+  .v5-fill.p65::after { width: 65%; }
+
+  /* Visual 6: Delivery checklist (simplified to 3 steps) */
+  .v6 { display: flex; flex-direction: column; gap: 14px; height: 100%; justify-content: center; }
+  .v6-step {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px; border: 1px solid var(--accent); background: var(--bg-deep);
+  }
+  .v6-check {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    color: var(--accent); font-weight: 600;
+  }
+  .v6-text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .v6-title {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text); text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .v6-meta {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    color: var(--text-dim); letter-spacing: 0.05em;
+  }
+
+  /* CLOSING */
+  .closing {
+    padding: 140px 0 120px;
+    border-top: 1px solid var(--line);
+  }
+
+  .closing-body {
+    max-width: 760px;
+    font-size: clamp(20px, 2vw, 26px);
+    line-height: 1.5;
+    color: var(--text);
+    font-weight: 300;
+    margin-bottom: 56px;
+    letter-spacing: -0.01em;
+  }
+
+  .closing-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1px solid var(--line-bright);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .btn:hover {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .btn.primary:hover {
+    background: var(--text);
+    border-color: var(--text);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .container, nav { padding-left: 24px; padding-right: 24px; }
+    .step-inner { grid-template-columns: 1fr; gap: 40px; }
+    .step { padding: 80px 0; min-height: auto; }
+    .progress-rail { display: none; }
+    footer { flex-direction: column; gap: 10px; text-align: center; }
+    body::after { background-size: 40px 40px; }
+    .v2-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">ZS / SALES ENGINEER</a>
+  <a href="index.html" class="back-link">Back to Portfolio</a>
+</nav>
+
+<!-- Progress rail -->
+<div class="progress-rail" id="progressRail">
+  <div class="progress-dot" data-step="1" data-label="Brief"></div>
+  <div class="progress-dot" data-step="2" data-label="Strategy"></div>
+  <div class="progress-dot" data-step="3" data-label="Script"></div>
+  <div class="progress-dot" data-step="4" data-label="Production"></div>
+  <div class="progress-dot" data-step="5" data-label="Post"></div>
+  <div class="progress-dot" data-step="6" data-label="Delivery"></div>
+</div>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-kicker">Sales Engineering / Video Production</div>
+    <h1>How I produced the video that helped win a $1.5M FIFA contract.</h1>
+    <p class="hero-sub">
+      This is a walkthrough of how I made a video submission for FIFA's open RFP for queuing services at the 2026 World Cup. The submission helped my team win a $1.5M contract. The page exists because the video itself belongs to my former employer, but the process behind it is mine.
+    </p>
+  </section>
+
+  <!-- STEP I: BRIEF -->
+  <section class="step" data-step="1">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">I</div>
+        <div class="step-kicker"><span class="num">I</span>Brief</div>
+        <h2 class="step-title">Turning the requirements into a plan.</h2>
+        <div class="step-body">
+          <p>FIFA's RFP was about eight pages of technical requirements for a queuing vendor. The default approach is to answer them in the order they're listed. I went a different way. I read through every requirement and assigned each one to a specific moment in the customer journey, from booking an appointment all the way through to the post-visit feedback survey. By the time I was done, every requirement had a home inside a story the video would already need to tell.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="Journey Map">
+          <div class="v1">
+            <div class="v1-caption">The Qmatic customer journey</div>
+            <div class="v1-svg-wrap">
+              <svg class="v1-svg" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+                <!-- Winding path connecting the 5 stages -->
+                <path
+                  d="M 50 60 Q 120 60 150 110 Q 180 160 250 140 Q 320 120 350 170 Q 380 220 430 220"
+                  fill="none"
+                  stroke="#2A3240"
+                  stroke-width="2"
+                  stroke-dasharray="4 4"
+                />
+                <!-- Stage 1: Book -->
+                <circle cx="50" cy="60" r="22" fill="#0A0E13" stroke="#D4AF63" stroke-width="1.5"/>
+                <text x="50" y="66" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4AF63" font-weight="500">1</text>
+                <text x="50" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8B8F97" letter-spacing="1">BOOK</text>
+                <!-- Stage 2: Check-in -->
+                <circle cx="150" cy="110" r="22" fill="#0A0E13" stroke="#D4AF63" stroke-width="1.5"/>
+                <text x="150" y="116" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4AF63" font-weight="500">2</text>
+                <text x="150" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8B8F97" letter-spacing="1">CHECK IN</text>
+                <!-- Stage 3: Wait -->
+                <circle cx="250" cy="140" r="22" fill="#0A0E13" stroke="#D4AF63" stroke-width="1.5"/>
+                <text x="250" y="146" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4AF63" font-weight="500">3</text>
+                <text x="250" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8B8F97" letter-spacing="1">WAIT</text>
+                <!-- Stage 4: Serve -->
+                <circle cx="350" cy="170" r="22" fill="#0A0E13" stroke="#D4AF63" stroke-width="1.5"/>
+                <text x="350" y="176" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4AF63" font-weight="500">4</text>
+                <text x="350" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8B8F97" letter-spacing="1">SERVE</text>
+                <!-- Stage 5: Feedback -->
+                <circle cx="430" cy="220" r="22" fill="#0A0E13" stroke="#D4AF63" stroke-width="1.5"/>
+                <text x="430" y="226" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4AF63" font-weight="500">5</text>
+                <text x="430" y="265" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8B8F97" letter-spacing="1">FEEDBACK</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP II: STRATEGY -->
+  <section class="step" data-step="2">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">II</div>
+        <div class="step-kicker"><span class="num">II</span>Strategy</div>
+        <h2 class="step-title">Designing the video to actually hold attention.</h2>
+        <div class="step-body">
+          <p>Most vendor demo videos answer technical requirements one at a time. Feature, check, next feature. It works, but it's boring to watch, and the people reviewing these submissions are watching a lot of them. I decided to build an actual narrative around the requirements instead. The video would still cover everything FIFA asked about, but it would do it in the natural flow of a story rather than as a checklist. My experience producing YouTube content has taught me a lot about what keeps a viewer watching, and this was a chance to apply that directly to the work.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="YouTube Analytics">
+          <div class="v2">
+            <div class="v2-grid">
+              <div class="v2-stat">
+                <div class="v2-stat-num">199.5K</div>
+                <div class="v2-stat-label">Views</div>
+              </div>
+              <div class="v2-stat">
+                <div class="v2-stat-num">152.7K</div>
+                <div class="v2-stat-label">Unique viewers</div>
+              </div>
+              <div class="v2-stat">
+                <div class="v2-stat-num">6:17</div>
+                <div class="v2-stat-label">Avg. view duration</div>
+              </div>
+              <div class="v2-stat">
+                <div class="v2-stat-num">5.3%</div>
+                <div class="v2-stat-label">Click-through rate</div>
+              </div>
+            </div>
+            <div class="v2-source">From a single Yester Zone video. YouTube analytics, since publication.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP III: SCRIPT -->
+  <section class="step" data-step="3">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">III</div>
+        <div class="step-kicker"><span class="num">III</span>Script</div>
+        <h2 class="step-title">Writing the script in three passes.</h2>
+        <div class="step-body">
+          <p>With the requirement mapping done, I start writing. The first pass is a loose outline. Just enough structure to see the shape of the story and decide what order the beats should go in. Once that feels right, I go back through and add bullet points under each main section: what I'll cover there, how long I think I'll spend on it, what the transition to the next section looks like. Once the outline is structured, I bring it to Claude and have it organize my thoughts into a clean, performable script. From there I review, make adjustments, and the script is ready for voiceover.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="Script Iterations">
+          <div class="v3">
+            <div class="v3-doc">
+              <div class="v3-doc-label">Outline</div>
+              <div class="v3-line full"></div>
+              <div class="v3-line md"></div>
+              <div class="v3-line sm"></div>
+            </div>
+            <div class="v3-doc">
+              <div class="v3-doc-label">Beats and timing</div>
+              <div class="v3-line full"></div>
+              <div class="v3-line sm" style="margin-left: 20px;"></div>
+              <div class="v3-line xs" style="margin-left: 20px;"></div>
+              <div class="v3-line md"></div>
+              <div class="v3-line sm" style="margin-left: 20px;"></div>
+            </div>
+            <div class="v3-doc">
+              <div class="v3-doc-label">Final script</div>
+              <div class="v3-line full"></div>
+              <div class="v3-line full"></div>
+              <div class="v3-line md"></div>
+              <div class="v3-line full"></div>
+              <div class="v3-line sm"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP IV: PRODUCTION -->
+  <section class="step" data-step="4">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">IV</div>
+        <div class="step-kicker"><span class="num">IV</span>Production</div>
+        <h2 class="step-title">How I assemble the video.</h2>
+        <div class="step-body">
+          <p>With the script finalized, I start with voiceover. I record into DaVinci Resolve at a comfortable pace and leave deliberate dead space between sentences. That way, if I flub a line, I can re-record just that sentence without having to re-align the waveform with everything that came before.</p>
+          <p>Once the VO is done, I put my headphones on, play it back, and start screen recording in time with my own voice. I'm walking through software I've used a thousand times, but now I'm doing it to the rhythm of the script. I'm careful to keep mouse movements smooth and deliberate. Jerky cursor work disorients viewers and breaks the spell of a polished demo.</p>
+          <p>I capture footage with OBS, ShareX, or QuickTime depending on what machine I'm on. All of them dump into a folder that auto-syncs with my DaVinci project and refreshes every three minutes. Start and stop are hotkeyed. The faster I can capture and re-capture, the more I can iterate without losing focus.</p>
+          <p>Then I assemble. I lay the screen recordings down on the timeline so that what's happening visually matches what I'm saying at every beat. After a rough assembly, I watch the video multiple times. Not to look for technical mistakes. I'm watching for moments where I would lose interest as a viewer.</p>
+          <p>Anything that doesn't serve the story gets cut, even when it's something I worked hard on. That's probably the hardest part of being an above-average editor. Knowing when to cut a clip you're proud of because it doesn't actually move the story forward. At the end of the day, the only thing that matters is whether every second supports the core mission of the video. If a moment doesn't, it's dead space, and it gets cut.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="DaVinci / Timeline">
+          <div class="v4">
+            <div class="v4-track">
+              <div class="v4-track-label">V1 / Screen Capture</div>
+              <div class="v4-track-bar">
+                <div class="v4-clip" style="width: 22%"></div>
+                <div class="v4-clip dim" style="width: 8%"></div>
+                <div class="v4-clip" style="width: 34%"></div>
+                <div class="v4-clip" style="width: 18%"></div>
+                <div class="v4-clip dim" style="width: 18%"></div>
+              </div>
+            </div>
+            <div class="v4-track">
+              <div class="v4-track-label">V2 / Motion Graphics</div>
+              <div class="v4-track-bar">
+                <div class="v4-clip dim" style="width: 14%"></div>
+                <div class="v4-clip" style="width: 10%"></div>
+                <div class="v4-clip dim" style="width: 40%"></div>
+                <div class="v4-clip" style="width: 12%"></div>
+                <div class="v4-clip dim" style="width: 24%"></div>
+              </div>
+            </div>
+            <div class="v4-track">
+              <div class="v4-track-label">A1 / Voiceover</div>
+              <div class="v4-track-bar">
+                <div class="v4-waveform">
+                  <span style="height: 30%"></span><span style="height: 60%"></span><span style="height: 80%"></span>
+                  <span style="height: 50%"></span><span style="height: 70%"></span><span style="height: 90%"></span>
+                  <span style="height: 40%"></span><span style="height: 65%"></span><span style="height: 30%"></span>
+                  <span style="height: 75%"></span><span style="height: 55%"></span><span style="height: 85%"></span>
+                  <span style="height: 45%"></span><span style="height: 70%"></span><span style="height: 60%"></span>
+                  <span style="height: 35%"></span><span style="height: 80%"></span><span style="height: 50%"></span>
+                  <span style="height: 65%"></span><span style="height: 40%"></span><span style="height: 75%"></span>
+                  <span style="height: 55%"></span><span style="height: 70%"></span><span style="height: 45%"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP V: POST-PRODUCTION -->
+  <section class="step" data-step="5">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">V</div>
+        <div class="step-kicker"><span class="num">V</span>Post</div>
+        <h2 class="step-title">How I finish the video.</h2>
+        <div class="step-body">
+          <p>With a clean rough cut in place, post-production is where the video starts feeling like real media instead of a screen recording with narration.</p>
+          <p>If I shot any footage on my own camera, I color grade it during this stage so it matches the rest of the video. I add subtle sound effects throughout. Not to show off, but because every movie I've ever watched does the same thing. Engaging more than one of the viewer's senses makes a piece of media more memorable, and a more memorable pitch has a better chance of closing a sale.</p>
+          <p>I use custom macros and plugins for motion graphics, zoom animations, and effects that draw the viewer's attention to specific parts of the screen. Sometimes that means highlighting an element. Sometimes it means blurring or masking everything around it.</p>
+          <p>The last step happens in DaVinci's Fairlight tab, which is where the audio gets its final treatment. I scan the high frequencies of my voice and cut anything that sounds harsh or boxy. I add a light voice isolation pass to clean up the room. And I run a DeEsser to handle any plosives that survived the recording.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="Effects Stack">
+          <div class="v5">
+            <div class="v5-row"><div class="v5-label">Color Grade</div><div class="v5-fill p80"></div></div>
+            <div class="v5-row"><div class="v5-label">Sound Design</div><div class="v5-fill p65"></div></div>
+            <div class="v5-row"><div class="v5-label">Motion Graphics</div><div class="v5-fill p90"></div></div>
+            <div class="v5-row"><div class="v5-label">Fairlight EQ</div><div class="v5-fill p75"></div></div>
+            <div class="v5-row"><div class="v5-label">De-Esser</div><div class="v5-fill p65"></div></div>
+            <div class="v5-row"><div class="v5-label">Zoom / Mask</div><div class="v5-fill p80"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP VI: DELIVERY -->
+  <section class="step" data-step="6">
+    <div class="step-inner">
+      <div class="step-text">
+        <div class="step-number">VI</div>
+        <div class="step-kicker"><span class="num">VI</span>Delivery</div>
+        <h2 class="step-title">How I deliver the final video.</h2>
+        <div class="step-body">
+          <p>With the final cut done, I export the video in H.265 ProRes. That codec preserves the quality of the motion graphics without producing a file size that's impractical to share. The export goes to a Dropbox folder, and I set the sharing permissions to match whatever the RFP specified. Once the upload finishes, I send the link to the vendor.</p>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="visual-frame" data-label="Delivery">
+          <div class="v6">
+            <div class="v6-step">
+              <div class="v6-check">✓</div>
+              <div class="v6-text">
+                <div class="v6-title">Export in H.265 ProRes</div>
+                <div class="v6-meta">Final cut, motion graphics preserved</div>
+              </div>
+            </div>
+            <div class="v6-step">
+              <div class="v6-check">✓</div>
+              <div class="v6-text">
+                <div class="v6-title">Upload to Dropbox</div>
+                <div class="v6-meta">Sharing permissions set per RFP spec</div>
+              </div>
+            </div>
+            <div class="v6-step">
+              <div class="v6-check">✓</div>
+              <div class="v6-text">
+                <div class="v6-title">Send the link to the vendor</div>
+                <div class="v6-meta">Submission complete</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing">
+    <p class="closing-body">
+      This is one project out of many. I've done versions of this kind of work across government, healthcare, and enterprise customers, and what keeps me coming back to it is the chance to take something complicated and make it land for the person on the other side of the screen. If you're looking for a sales engineer who cares about the craft of this work as much as the outcome, I'd love to connect.
+    </p>
+    <div class="closing-actions">
+      <a href="index.html" class="btn primary">Back to portfolio</a>
+      <a href="mailto:zachary.straley@gmail.com" class="btn">Get in touch</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 ZACH STRALEY</span>
+    <span>CHATTANOOGA / REMOTE</span>
+    <span>CASE STUDY V2</span>
+  </footer>
+
+</div>
+
+<script>
+  // Dynamic year
+  const year = new Date().getFullYear();
+  document.querySelector('footer span:first-child').textContent = `© ${year} ZACH STRALEY`;
+
+  // Step reveal on scroll
+  const stepObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.step').forEach(step => stepObserver.observe(step));
+
+  // Progress rail state
+  const progressRail = document.getElementById('progressRail');
+  const steps = document.querySelectorAll('.step');
+  const dots = document.querySelectorAll('.progress-dot');
+
+  const progressObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const stepNum = parseInt(entry.target.getAttribute('data-step'));
+        dots.forEach(dot => {
+          const dotStep = parseInt(dot.getAttribute('data-step'));
+          dot.classList.remove('active', 'passed');
+          if (dotStep < stepNum) dot.classList.add('passed');
+          if (dotStep === stepNum) dot.classList.add('active');
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+
+  steps.forEach(step => progressObserver.observe(step));
+
+  // Click-to-scroll on progress dots
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const stepNum = dot.getAttribute('data-step');
+      const target = document.querySelector(`.step[data-step="${stepNum}"]`);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Show progress rail after hero
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > window.innerHeight * 0.6) {
+      progressRail.classList.add('active');
+    } else {
+      progressRail.classList.remove('active');
+    }
+  });
+</script>
+
+</body>
+</html>
